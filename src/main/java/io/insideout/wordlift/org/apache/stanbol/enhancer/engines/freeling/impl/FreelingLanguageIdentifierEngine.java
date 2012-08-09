@@ -1,12 +1,21 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_TYPE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.DCTERMS_LINGUISTIC_SYSTEM;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.clerezza.rdf.core.LiteralFactory;
+import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
+import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
@@ -21,6 +30,7 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.InvalidContentException;
 import org.apache.stanbol.enhancer.servicesapi.ServiceProperties;
 import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
+import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.apache.stanbol.enhancer.servicesapi.impl.AbstractEnhancementEngine;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -40,11 +50,18 @@ public class FreelingLanguageIdentifierEngine extends
     private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
     private static final Set<String> SUPPORTED_MIMETYPES = Collections.singleton(TEXT_PLAIN_MIMETYPE);
 
+    private final String libraryPath = "/Users/david/workspaces/freeling/freeling/APIs/java/libfreeling_javaAPI.so";
+    private final String configurationPath = "/Users/david/workspaces/io.insideout/wordlift/freeling-engine/src/main/resources/languageIdentifierConfiguration.cfg";
+    private final String languages = "";
+    private LanguageIdentifier languageIdentifier;
+
     @Activate
     protected void activate(ComponentContext context) throws ConfigurationException {
         super.activate(context);
 
         logger.trace("The Freeling Language Identifier engine is being activated.");
+
+        languageIdentifier = new LanguageIdentifier(libraryPath, configurationPath);
     }
 
     @Deactivate
@@ -52,6 +69,11 @@ public class FreelingLanguageIdentifierEngine extends
         super.deactivate(context);
 
         logger.trace("The Freeling Language Identifier engine is being deactivated.");
+
+        languageIdentifier = null;
+
+        // ensure the resources used by the languageIdentifier get released.
+        System.gc();
     }
 
     @Override
@@ -98,8 +120,27 @@ public class FreelingLanguageIdentifierEngine extends
         logger.trace("The Freeling Language Identifier engine received the following text for analysis:\n{}",
             text);
 
-        LanguageIdentifier languageIdentifier = new LanguageIdentifier();
-        languageIdentifier.analyzeText(text);
+        Set<Language> identifiedLanguages = languageIdentifier.identifyLanguage(text, languages);
+
+        // return if no languages have been found.
+        if (null == identifiedLanguages || 0 == identifiedLanguages.size()) return;
+
+        MGraph g = ci.getMetadata();
+        ci.getLock().writeLock().lock();
+
+        try {
+            for (Language language : identifiedLanguages) {
+                UriRef textEnhancement = EnhancementEngineHelper.createTextEnhancement(ci, this);
+                g.add(new TripleImpl(textEnhancement, DC_LANGUAGE, new PlainLiteralImpl(language
+                        .getTwoLetterCode())));
+                g.add(new TripleImpl(textEnhancement, ENHANCER_CONFIDENCE, LiteralFactory.getInstance()
+                        .createTypedLiteral(language.getRank())));
+                g.add(new TripleImpl(textEnhancement, DC_TYPE, DCTERMS_LINGUISTIC_SYSTEM));
+
+            }
+        } finally {
+            ci.getLock().writeLock().unlock();
+        }
 
     }
 }
