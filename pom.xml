@@ -49,7 +49,10 @@
 						<!-- TODO those should be bundles! -->
 						<Embed-Dependency>
 						</Embed-Dependency>
-					</instructions>
+<!-- 						 <Bundle-NativeCode>
+						 	/Users/david/workspaces/freeling/freeling/APIs/java/libfreeling_javaAPI.so; processor = x86_64; processor = x86; osname = MacOSX
+						 </Bundle-NativeCode>
+ -->					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>

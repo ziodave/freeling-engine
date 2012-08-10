@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
-    <OCD id="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine" name="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine.name" description="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine.description">
-        <AD id="stanbol.enhancer.engine.name" type="String" name="%stanbol.enhancer.engine.name.name" description="%stanbol.enhancer.engine.name.description"/>
-    </OCD>
     <OCD id="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine" name="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine.name" description="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine.description">
         <AD id="stanbol.enhancer.engine.name" type="String" default="freelingLanguageIdentifier" name="%stanbol.enhancer.engine.name.name" description="%stanbol.enhancer.engine.name.description"/>
     </OCD>
-    <Designate pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine" factoryPid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine">
-        <Object ocdref="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingEngine"/>
-    </Designate>
+    <OCD id="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine" name="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine.name" description="%io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine.description">
+        <AD id="stanbol.enhancer.engine.name" type="String" name="%stanbol.enhancer.engine.name.name" description="%stanbol.enhancer.engine.name.description"/>
+    </OCD>
     <Designate pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine" factoryPid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine">
         <Object ocdref="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingLanguageIdentifierEngine"/>
+    </Designate>
+    <Designate pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine" factoryPid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine">
+        <Object ocdref="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingPartOfSpeechTaggingEngine"/>
     </Designate>
 </metatype:MetaData>

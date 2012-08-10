@@ -50,7 +50,8 @@ public class FreelingLanguageIdentifierEngine extends
     private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
     private static final Set<String> SUPPORTED_MIMETYPES = Collections.singleton(TEXT_PLAIN_MIMETYPE);
 
-    private final String libraryPath = "/Users/david/workspaces/freeling/freeling/APIs/java/libfreeling_javaAPI.so";
+    private final String locale = "default";
+//    private final String libraryPath = "/Users/david/workspaces/freeling/freeling/APIs/java/libfreeling_javaAPI.so";
     private final String configurationPath = "/Users/david/workspaces/io.insideout/wordlift/freeling-engine/src/main/resources/languageIdentifierConfiguration.cfg";
     private final String languages = "";
     private LanguageIdentifier languageIdentifier;
@@ -61,7 +62,8 @@ public class FreelingLanguageIdentifierEngine extends
 
         logger.trace("The Freeling Language Identifier engine is being activated.");
 
-        languageIdentifier = new LanguageIdentifier(libraryPath, configurationPath);
+        languageIdentifier = new LanguageIdentifier(locale, configurationPath);
+
     }
 
     @Deactivate

@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.upc.freeling.LangIdent;
-import edu.upc.freeling.Util;
-import edu.upc.freeling.VectorPairDoubleString;
 import edu.upc.freeling.PairDoubleString;
 import edu.upc.freeling.SWIGTYPE_p_std__setT_std__wstring_t;
+import edu.upc.freeling.Util;
+import edu.upc.freeling.VectorPairDoubleString;
 
 public class LanguageIdentifier {
 
@@ -18,19 +18,13 @@ public class LanguageIdentifier {
 
     private LangIdent languageIdentifier = null;
 
-    public LanguageIdentifier(String libraryPath, String configurationPath) {
-        logger.trace("Loading Freeling library.");
+    private final Freeling freeling = new Freeling();
 
-        try {
-            System.load(libraryPath);
-        } catch (UnsatisfiedLinkError e) {
-            logger.warn(
-                "An error occured while loading the Freeling library [libraryPath :: {}][errorClass :: {}]:\n{}",
-                new Object[] {libraryPath, e.getClass(), e.getMessage()});
-        }
+    public LanguageIdentifier(String locale, String configurationPath) {
 
         logger.trace("Loading Freeling Language Identifier configuration.");
 
+        Util.initLocale(locale);
         languageIdentifier = new LangIdent(configurationPath);
 
         logger.trace("Freeling Language Identifier configuration loaded.");

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 @Component(configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, specVersion = "1.1", metatype = true, immediate = true, inherit = true)
 @Service
 @org.apache.felix.scr.annotations.Properties(value = {@Property(name = EnhancementEngine.PROPERTY_NAME)})
-public class FreelingEngine extends AbstractEnhancementEngine<RuntimeException,RuntimeException> implements
+public class FreelingPartOfSpeechTaggingEngine extends AbstractEnhancementEngine<RuntimeException,RuntimeException> implements
         EnhancementEngine, ServiceProperties {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
