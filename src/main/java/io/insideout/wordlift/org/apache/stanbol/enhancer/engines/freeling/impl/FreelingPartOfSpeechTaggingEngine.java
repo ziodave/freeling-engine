@@ -1,8 +1,18 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_SELECTED_TEXT;
+import io.insideout.wordlift.org.apache.stanbol.services.StanbolService;
+
+import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.clerezza.rdf.core.Language;
+import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
+import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
@@ -12,7 +22,11 @@ import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
+import org.apache.stanbol.enhancer.servicesapi.InvalidContentException;
 import org.apache.stanbol.enhancer.servicesapi.ServiceProperties;
+import org.apache.stanbol.enhancer.servicesapi.helper.ContentItemHelper;
+import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.apache.stanbol.enhancer.servicesapi.impl.AbstractEnhancementEngine;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -22,10 +36,22 @@ import org.slf4j.LoggerFactory;
 @Component(configurationFactory = true, policy = ConfigurationPolicy.REQUIRE, specVersion = "1.1", metatype = true, immediate = true, inherit = true)
 @Service
 @org.apache.felix.scr.annotations.Properties(value = {@Property(name = EnhancementEngine.PROPERTY_NAME)})
-public class FreelingPartOfSpeechTaggingEngine extends AbstractEnhancementEngine<RuntimeException,RuntimeException> implements
-        EnhancementEngine, ServiceProperties {
+public class FreelingPartOfSpeechTaggingEngine extends
+        AbstractEnhancementEngine<RuntimeException,RuntimeException> implements EnhancementEngine,
+        ServiceProperties {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
+    private static final Set<String> SUPPORTED_MIMETYPES = Collections.singleton(TEXT_PLAIN_MIMETYPE);
+
+    private final Freeling freeling = new Freeling();
+
+    private final String freelingSharePath = "/usr/local/Cellar/freeling/HEAD/share/freeling";
+    private final String configurationPath = "/usr/local/Cellar/freeling/HEAD/share/freeling/config";
+    private final String configurationFilenameSuffix = ".cfg";
+
+    private PartOfSpeechTagging partOfSpeechTagging;
 
     /**
      * The default value for the Execution of this Engine. Currently set to
@@ -38,6 +64,8 @@ public class FreelingPartOfSpeechTaggingEngine extends AbstractEnhancementEngine
         super.activate(context);
 
         logger.trace("The Freeling engine is being activated.");
+
+        partOfSpeechTagging = new PartOfSpeechTagging();
     }
 
     @Deactivate
@@ -55,14 +83,60 @@ public class FreelingPartOfSpeechTaggingEngine extends AbstractEnhancementEngine
 
     @Override
     public int canEnhance(ContentItem ci) throws EngineException {
-        // TODO Auto-generated method stub
-        return 0;
+
+        if (null != ContentItemHelper.getBlob(ci, SUPPORTED_MIMETYPES)) {
+
+            String language = EnhancementEngineHelper.getLanguage(ci);
+            String propertiesFilePath = String.format("%s/%s%s", configurationPath, language,
+                configurationFilenameSuffix);
+
+            File propertiesFile = new File(propertiesFilePath);
+            if (propertiesFile.exists() && propertiesFile.isFile()) return ENHANCE_ASYNC;
+        }
+
+        return CANNOT_ENHANCE;
     }
 
     @Override
     public void computeEnhancements(ContentItem ci) throws EngineException {
-        // TODO Auto-generated method stub
+        String languageTwoLetterCode = EnhancementEngineHelper.getLanguage(ci);
 
+        String propertiesFilePath = String.format("%s/%s%s", configurationPath, languageTwoLetterCode,
+            configurationFilenameSuffix);
+
+        logger.info("Reading properties from configuration file [{}]", propertiesFilePath);
+
+        FreelingProperties freelingProperties = new FreelingProperties(propertiesFilePath, freelingSharePath);
+
+        logger.info("[locale :: {}]", freelingProperties.getLocale());
+
+        String text = StanbolService.getTextFromContentItem(ci);
+
+        if (null == text || 0 == text.trim().length()) throw new InvalidContentException(this, ci, null);
+
+        Set<String> nouns = partOfSpeechTagging.getNouns(freelingProperties, text);
+
+        Language language = new Language(languageTwoLetterCode);
+        MGraph g = ci.getMetadata();
+        ci.getLock().writeLock().lock();
+        try {
+            for (String noun : nouns) {
+                UriRef textAnnotation = EnhancementEngineHelper.createTextEnhancement(ci, this);
+                g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTED_TEXT, new PlainLiteralImpl(noun,
+                        language)));
+                // g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTION_CONTEXT, new PlainLiteralImpl(
+                // occurrence.context, language)));
+                // g.add(new TripleImpl(textAnnotation, DC_TYPE, typeUri));
+                // g.add(new TripleImpl(textAnnotation, ENHANCER_CONFIDENCE, literalFactory
+                // .createTypedLiteral(occurrence.confidence)));
+                // if (occurrence.start != null && occurrence.end != null) {
+                // g.add(new TripleImpl(textAnnotation, ENHANCER_START, literalFactory
+                // .createTypedLiteral(occurrence.start)));
+                // g.add(new TripleImpl(textAnnotation, ENHANCER_END, literalFactory
+                // .createTypedLiteral(occurrence.end)));
+            }
+        } finally {
+            ci.getLock().writeLock().unlock();
+        }
     }
-
 }

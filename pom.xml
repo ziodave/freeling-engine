@@ -39,10 +39,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>
-							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling;version=${project.version}
-						</Export-Package>
+	<!-- <Export-Package> io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling;version=${project.version} 
+		</Export-Package> -->
 						<Private-Package>
+							io.insideout.wordlift.org.apache.stanbol.domain.*,
 							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.*,
 							edu.upc.freeling.*
 						</Private-Package>

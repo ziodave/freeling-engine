@@ -4,13 +4,11 @@ import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.DCTERMS_LINGUISTIC_SYSTEM;
-
 import io.insideout.wordlift.org.apache.stanbol.domain.Language;
+import io.insideout.wordlift.org.apache.stanbol.services.StanbolService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.clerezza.rdf.core.LiteralFactory;
@@ -25,7 +23,6 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.stanbol.enhancer.servicesapi.Blob;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EngineException;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
@@ -53,7 +50,6 @@ public class FreelingLanguageIdentifierEngine extends
     private static final Set<String> SUPPORTED_MIMETYPES = Collections.singleton(TEXT_PLAIN_MIMETYPE);
 
     private final String locale = "default";
-//    private final String libraryPath = "/Users/david/workspaces/freeling/freeling/APIs/java/libfreeling_javaAPI.so";
     private final String configurationPath = "/Users/david/workspaces/io.insideout/wordlift/freeling-engine/src/main/resources/languageIdentifierConfiguration.cfg";
     private final String languages = "";
     private LanguageIdentifier languageIdentifier;
@@ -100,26 +96,9 @@ public class FreelingLanguageIdentifierEngine extends
     @Override
     public void computeEnhancements(ContentItem ci) throws EngineException {
 
-        Entry<UriRef,Blob> contentPart = ContentItemHelper.getBlob(ci, SUPPORTED_MIMETYPES);
+        String text = StanbolService.getTextFromContentItem(ci);
 
-        if (contentPart == null) throw new IllegalStateException(
-                "No ContentPart with Mimetype '" + TEXT_PLAIN_MIMETYPE + "' found for ContentItem "
-                        + ci.getUri() + ": This is also checked in the canEnhance method! -> This "
-                        + "indicated an Bug in the implementation of the " + "EnhancementJobManager!");
-
-        String text = "";
-
-        try {
-            text = ContentItemHelper.getText(contentPart.getValue());
-        } catch (IOException e) {
-            throw new InvalidContentException(this, ci, e);
-        }
-
-        if (text.trim().length() == 0) {
-            logger.warn("No text contained in ContentPart {} of ContentItem {}", contentPart.getKey(),
-                ci.getUri());
-            return;
-        }
+        if (null == text || 0 == text.trim().length()) throw new InvalidContentException(this, ci, null);
 
         logger.trace("The Freeling Language Identifier engine received the following text for analysis:\n{}",
             text);

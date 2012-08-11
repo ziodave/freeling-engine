@@ -30,7 +30,7 @@ public class TestPartOfSpeechTagging {
         String text = TestUtils.getText(String.format("/enel%s.txt", language));
 
         PartOfSpeechTagging partOfSpeechTagging = new PartOfSpeechTagging();
-        partOfSpeechTagging.tag(freelingProperties, text);
+        partOfSpeechTagging.getNouns(freelingProperties, text);
 
     }
 

@@ -18,10 +18,9 @@ public class LanguageIdentifier {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private LangIdent languageIdentifier = null;
-
-    @SuppressWarnings("unused")
     private final Freeling freeling = new Freeling();
+
+    private LangIdent languageIdentifier = null;
 
     public LanguageIdentifier(String locale, String configurationPath) {
 
