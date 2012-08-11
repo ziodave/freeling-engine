@@ -3,7 +3,7 @@ package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.Language;
+import io.insideout.wordlift.org.apache.stanbol.domain.Language;
 import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.LanguageIdentifier;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class TestLanguageIdentifier {
         logger.info("Testing language [{}].", language);
 
         String filename = String.format("/%s.txt", language);
-        String text = getText(filename);
+        String text = TestUtils.getText(filename);
 
         logger.info("Text: {}...", text.substring(0, 16));
 
@@ -89,38 +89,4 @@ public class TestLanguageIdentifier {
 
     }
 
-    private String getText(String filename) {
-        String text = "";
-
-        InputStream inputStream = getClass().getResourceAsStream(filename);
-        BufferedReader reader = null;
-
-        try {
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line = null;
-
-            while ((line = reader.readLine()) != null) {
-                text += line + "\n";
-            }
-
-        } catch (FileNotFoundException e) {
-
-            fail(String.format("File [%s] not found.", filename));
-
-        } catch (IOException e) {
-
-            fail(String.format("An exception occured:\n%s.", e.getMessage()));
-
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {}
-        }
-
-        return text;
-
-    }
 }

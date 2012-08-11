@@ -1,5 +1,7 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
+import io.insideout.wordlift.org.apache.stanbol.domain.Language;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +20,7 @@ public class LanguageIdentifier {
 
     private LangIdent languageIdentifier = null;
 
+    @SuppressWarnings("unused")
     private final Freeling freeling = new Freeling();
 
     public LanguageIdentifier(String locale, String configurationPath) {
@@ -66,7 +69,6 @@ public class LanguageIdentifier {
         return languageIdentifier.identifyLanguage(text, languages);
     }
 
-    @SuppressWarnings("unused")
     private Set<Language> identifyMultipleLanguages(String text, SWIGTYPE_p_std__setT_std__wstring_t languages) {
 
         VectorPairDoubleString languageRanks = new VectorPairDoubleString();

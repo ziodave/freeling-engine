@@ -5,6 +5,8 @@ import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_TYPE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.DCTERMS_LINGUISTIC_SYSTEM;
 
+import io.insideout.wordlift.org.apache.stanbol.domain.Language;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;

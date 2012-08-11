@@ -1,4 +1,4 @@
-package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
+package io.insideout.wordlift.org.apache.stanbol.domain;
 
 public class Language {
 
