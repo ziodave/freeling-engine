@@ -1,6 +1,10 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_END;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_SELECTED_TEXT;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_START;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
+import io.insideout.wordlift.org.apache.stanbol.domain.Noun;
 import io.insideout.wordlift.org.apache.stanbol.services.StanbolService;
 
 import java.io.File;
@@ -9,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.clerezza.rdf.core.Language;
+import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
@@ -45,6 +50,7 @@ public class FreelingPartOfSpeechTaggingEngine extends
     private static final String TEXT_PLAIN_MIMETYPE = "text/plain";
     private static final Set<String> SUPPORTED_MIMETYPES = Collections.singleton(TEXT_PLAIN_MIMETYPE);
 
+    @SuppressWarnings("unused")
     private final Freeling freeling = new Freeling();
 
     private final String freelingSharePath = "/usr/local/Cellar/freeling/HEAD/share/freeling";
@@ -114,26 +120,26 @@ public class FreelingPartOfSpeechTaggingEngine extends
 
         if (null == text || 0 == text.trim().length()) throw new InvalidContentException(this, ci, null);
 
-        Set<String> nouns = partOfSpeechTagging.getNouns(freelingProperties, text);
+        Set<Noun> nouns = partOfSpeechTagging.getNouns(freelingProperties, text);
 
         Language language = new Language(languageTwoLetterCode);
         MGraph g = ci.getMetadata();
         ci.getLock().writeLock().lock();
         try {
-            for (String noun : nouns) {
+            for (Noun noun : nouns) {
                 UriRef textAnnotation = EnhancementEngineHelper.createTextEnhancement(ci, this);
-                g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTED_TEXT, new PlainLiteralImpl(noun,
-                        language)));
+                g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTED_TEXT, new PlainLiteralImpl(noun
+                        .getWord(), language)));
                 // g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTION_CONTEXT, new PlainLiteralImpl(
                 // occurrence.context, language)));
                 // g.add(new TripleImpl(textAnnotation, DC_TYPE, typeUri));
-                // g.add(new TripleImpl(textAnnotation, ENHANCER_CONFIDENCE, literalFactory
-                // .createTypedLiteral(occurrence.confidence)));
+                g.add(new TripleImpl(textAnnotation, ENHANCER_CONFIDENCE, LiteralFactory.getInstance()
+                        .createTypedLiteral(noun.getConfidence())));
                 // if (occurrence.start != null && occurrence.end != null) {
-                // g.add(new TripleImpl(textAnnotation, ENHANCER_START, literalFactory
-                // .createTypedLiteral(occurrence.start)));
-                // g.add(new TripleImpl(textAnnotation, ENHANCER_END, literalFactory
-                // .createTypedLiteral(occurrence.end)));
+                g.add(new TripleImpl(textAnnotation, ENHANCER_START, LiteralFactory.getInstance()
+                        .createTypedLiteral(noun.getStart())));
+                g.add(new TripleImpl(textAnnotation, ENHANCER_END, LiteralFactory.getInstance()
+                        .createTypedLiteral(noun.getEnd())));
             }
         } finally {
             ci.getLock().writeLock().unlock();

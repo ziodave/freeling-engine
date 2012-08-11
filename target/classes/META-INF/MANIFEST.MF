@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1344716674012
+Build-Jdk: 1.6.0_33
+Built-By: david
+Bundle-Category: Stanbol Enhancer
+Bundle-DocURL: http://incubator.apache.org/stanbol
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: Apache Stanbol Enhancer Enhancement Engine : Freeling (by I
+ nsideOut10)
+Bundle-SymbolicName: io.insideout.wordlift.org.apache.stanbol.enhancer.e
+ ngines.freeling
+Bundle-Vendor: Apache Stanbol (Incubating)
+Bundle-Version: 0.10.0.incubating-SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: io.insideout.wordlift.org.apache.stanbol.domain;version=
+ "0.10.0.incubating-SNAPSHOT",io.insideout.wordlift.org.apache.stanbol.s
+ ervices;uses:="org.apache.stanbol.enhancer.servicesapi.helper,org.apach
+ e.stanbol.enhancer.servicesapi,org.apache.clerezza.rdf.core";version="0
+ .10.0.incubating-SNAPSHOT"
+Import-Package: io.insideout.wordlift.org.apache.stanbol.domain,io.insid
+ eout.wordlift.org.apache.stanbol.services,org.apache.clerezza.rdf.core,
+ org.apache.clerezza.rdf.core.access,org.apache.clerezza.rdf.core.impl,o
+ rg.apache.stanbol.enhancer.servicesapi;version="0.10.0",org.apache.stan
+ bol.enhancer.servicesapi.helper;version="0.10.0",org.apache.stanbol.enh
+ ancer.servicesapi.impl;version="0.10.0",org.apache.stanbol.enhancer.ser
+ vicesapi.rdf;version="0.10.0",org.osgi.service.cm;version="1.2.0",org.o
+ sgi.service.component;version="1.0.0",org.slf4j;version="1.6.1"
+Service-Component: OSGI-INF/serviceComponents.xml
+Tool: Bnd-1.50.0

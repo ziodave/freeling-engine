@@ -17,8 +17,27 @@ public class TestPartOfSpeechTagging {
 
     @Test
     public void test() {
+        // testLanguage("bg");
+        testLanguage("ca");
+        // testLanguage("cs");
+        // testLanguage("de");
+        testLanguage("en");
+        testLanguage("es");
+        // testLanguage("fr");
+        testLanguage("gl");
+        // testLanguage("hi");
+        // testLanguage("hr");
+        testLanguage("it");
+        // testLanguage("ja");
+        testLanguage("pt");
+        // testLanguage("sk");
+        // testLanguage("sl");
+        // testLanguage("sr");
+        // testLanguage("zh");
+    }
 
-        String language = "it";
+    private void testLanguage(String language) {
+
         String propertiesFilePath = String.format("%s/%s%s", configurationPath, language,
             configurationFilenameSuffix);
 
@@ -27,7 +46,7 @@ public class TestPartOfSpeechTagging {
         FreelingProperties freelingProperties = new FreelingProperties(propertiesFilePath, freelingSharePath);
         logger.info("[locale :: {}]", freelingProperties.getLocale());
 
-        String text = TestUtils.getText(String.format("/enel%s.txt", language));
+        String text = TestUtils.getText(String.format("/%s.txt", language));
 
         PartOfSpeechTagging partOfSpeechTagging = new PartOfSpeechTagging();
         partOfSpeechTagging.getNouns(freelingProperties, text);

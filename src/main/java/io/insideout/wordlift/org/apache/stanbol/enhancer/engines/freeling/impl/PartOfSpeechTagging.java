@@ -1,5 +1,7 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
+import io.insideout.wordlift.org.apache.stanbol.domain.Noun;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -7,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.upc.freeling.Analysis;
 import edu.upc.freeling.ChartParser;
 import edu.upc.freeling.DepTxala;
 import edu.upc.freeling.HmmTagger;
@@ -15,6 +18,7 @@ import edu.upc.freeling.ListWord;
 import edu.upc.freeling.Maco;
 import edu.upc.freeling.MacoOptions;
 import edu.upc.freeling.Nec;
+import edu.upc.freeling.Senses;
 import edu.upc.freeling.Sentence;
 import edu.upc.freeling.Splitter;
 import edu.upc.freeling.Tokenizer;
@@ -26,7 +30,9 @@ public class PartOfSpeechTagging {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public Set<String> getNouns(FreelingProperties properties, String text) {
+    private final Freeling freeling = new Freeling();
+
+    public Set<Noun> getNouns(FreelingProperties properties, String text) {
 
         logger.trace("Setting locale [{}].", properties.getLocale());
 
@@ -94,15 +100,21 @@ public class PartOfSpeechTagging {
             nec = new Nec(properties.getNecFile());
         }
 
-        logger.info("Creating the disambiguation tool.");
-        UkbWrap ukbWrap = new UkbWrap(properties.getUkbConfigFile());
-
         // Instead of "UkbWrap", you can use a "Senses" object, that simply
         // gives all possible WN senses, sorted by frequency.
-        // Senses dis = new Senses(DATA+LANG+"/senses.dat");
-        //
-        // Make sure the encoding matches your input text (utf-8, iso-8859-15, ...)
-        // BufferedReader input = new BufferedReader(new InputStreamReader(System.in, "utf-8"));
+        Senses senses = null;
+        File senseConfigFile = new File(properties.getSenseConfigFile());
+        if (senseConfigFile.exists() && senseConfigFile.isFile()) {
+            logger.info("Creating the senses tool.");
+            senses = new Senses(properties.getSenseConfigFile());
+        }
+
+        UkbWrap ukbWrap = null;
+        File ukbConfigFile = new File(properties.getUkbConfigFile());
+        if (ukbConfigFile.exists() && ukbConfigFile.isFile()) {
+            logger.info("Creating the disambiguation tool.");
+            ukbWrap = new UkbWrap(properties.getUkbConfigFile());
+        }
 
         // Extract the tokens from the line of text.
         ListWord listWord = tokenizer.tokenize(text);
@@ -121,8 +133,9 @@ public class PartOfSpeechTagging {
             nec.analyze(listSentence);
         }
 
-        // sen.analyze(ls);
-        ukbWrap.analyze(listSentence);
+        if (null != ukbWrap) ukbWrap.analyze(listSentence);
+
+        if (null != senses) senses.analyze(listSentence);
 
         // Chunk parser
         if (null != chartParser) chartParser.analyze(listSentence);
@@ -133,8 +146,8 @@ public class PartOfSpeechTagging {
         return getNouns(listSentence);
     }
 
-    private Set<String> getNouns(ListSentence listSentence) {
-        Set<String> nouns = new HashSet<String>();
+    private Set<Noun> getNouns(ListSentence listSentence) {
+        Set<Noun> nouns = new HashSet<Noun>();
 
         // get the analyzed words out of ls.
         for (int i = 0; i < listSentence.size(); i++) {
@@ -145,16 +158,24 @@ public class PartOfSpeechTagging {
 
                 if (!"NP".equals(word.getShortTag())) continue;
 
-                nouns.add(word.getForm().replace("_", " "));
+                Analysis analysis = word.getAnalysis().get(0);
 
+                long start = word.getSpanStart();
+                long finish = word.getSpanFinish();
+                Double confidence = analysis.getProb();
+
+                nouns.add(new Noun(word.getForm().replace("_", " "), start, finish, confidence));
+
+                // logger.info(word.getSensesString(0));
                 logger.info(
-                    "[form :: {}][lc_form :: {}][lemma :: {}][tag :: {}][short_tag :: {}].",
+                    "[form :: {}][lc_form :: {}][lemma :: {}][tag :: {}][short_tag :: {}][senses :: {}][analysis size :: {}][foundInDict :: {}][spanStart :: {}][spanFinish :: {}].",
                     new Object[] {word.getForm(), word.getLcForm(), word.getLemma(), word.getTag(),
-                                  word.getShortTag()});
+                                  word.getShortTag(), word.getSensesString(), word.getAnalysis().size(),
+                                  word.foundInDict(), word.getSpanStart(), word.getSpanFinish()});
+
             }
         }
 
         return nouns;
     }
-
 }
