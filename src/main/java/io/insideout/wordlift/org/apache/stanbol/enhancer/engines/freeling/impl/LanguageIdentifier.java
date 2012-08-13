@@ -25,6 +25,16 @@ public class LanguageIdentifier {
 
     public LanguageIdentifier(String locale, String configurationPath) {
 
+//        try {
+//            logger.trace("Loading the Freeling support library.");
+//            FreelingClassLoader.getInstance().findClass(
+//                "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.Freeling");
+//            logger.trace("Successfully loaded the Freeling support library.");
+//        } catch (ClassNotFoundException e) {
+//            logger.error("Error loading the Freeling support library [{}]:\n{}",
+//                new Object[] {e.getClass(), e.getMessage()}, e);
+//        }
+
         logger.trace("Loading Freeling Language Identifier configuration.");
 
         Util.initLocale(locale);

@@ -60,8 +60,12 @@ public class FreelingLanguageIdentifierEngine extends
 
         logger.trace("The Freeling Language Identifier engine is being activated.");
 
-        languageIdentifier = new LanguageIdentifier(locale, configurationPath);
-
+        try {
+            languageIdentifier = new LanguageIdentifier(locale, configurationPath);
+        } catch (Exception e) {
+            logger.error("An exception [{}] occured while loading the Language Identifier:\n{}",
+                new Object[] {e.getClass(), e.getMessage()}, e);
+        }
     }
 
     @Deactivate
@@ -70,9 +74,8 @@ public class FreelingLanguageIdentifierEngine extends
 
         logger.trace("The Freeling Language Identifier engine is being deactivated.");
 
+        // ensure the Freeling support library gets released.
         languageIdentifier = null;
-
-        // ensure the resources used by the languageIdentifier get released.
         System.gc();
     }
 
