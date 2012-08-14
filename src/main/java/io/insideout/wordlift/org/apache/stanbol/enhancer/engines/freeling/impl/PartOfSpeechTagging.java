@@ -30,7 +30,7 @@ public class PartOfSpeechTagging {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-     @SuppressWarnings("unused")
+    @SuppressWarnings("unused")
     private final Freeling freeling = new Freeling();
 
     public PartOfSpeechTagging() {
@@ -169,7 +169,7 @@ public class PartOfSpeechTagging {
             for (int j = 0; j < sentence.size(); j++) {
                 Word word = sentence.get(j);
 
-                if (!"NP".equals(word.getShortTag())) continue;
+                if (!"NP".equals(word.getShortTag()) || !word.foundInDict()) continue;
 
                 Analysis analysis = word.getAnalysis().get(0);
 

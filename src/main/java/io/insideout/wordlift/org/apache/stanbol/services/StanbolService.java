@@ -29,24 +29,4 @@ public class StanbolService {
         }
     }
 
-    // public static Entityhub getEntityhub(ComponentContext context) {
-    //
-    // // according to http://incubator.apache.org/stanbol/docs/trunk/components/entityhub/
-    // // "An Apache Stanbol instance can only have a single Entityhub".
-    //
-    // ServiceReference entityHubServiceReference = context.getBundleContext().getServiceReference(
-    // Entityhub.class.getName());
-    // return (Entityhub) context.getBundleContext().getService(entityHubServiceReference);
-    // }
-    //
-    // public static Site getSite(ComponentContext context) {
-    //
-    // // according to http://incubator.apache.org/stanbol/docs/trunk/components/entityhub/
-    // // "An Apache Stanbol instance can only have a single Entityhub".
-    //
-    // ServiceReference entityHubServiceReference = context.getBundleContext().getServiceReference(
-    // Site.class.getName());
-    // return (Site) context.getBundleContext().getService(entityHubServiceReference);
-    // }
-
 }
